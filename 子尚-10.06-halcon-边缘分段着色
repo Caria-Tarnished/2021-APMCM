@@ -1,0 +1,59 @@
+* 读取原始图像  
+read_image(Image, 'Pic1_1.bmp')  
+
+* 边缘检测  
+edges_sub_pix(Image, Edges, 'canny', 1, 20, 40)  
+
+* 分割轮廓  
+segment_contours_xld(Edges, ContoursSplit, 'lines_circles', 5, 4, 2)  
+
+* 创建一个空图像用于绘制彩色轮廓  
+get_image_size(Image, Width, Height)  
+gen_empty_obj(ContoursColor)  
+* 修改了这里的变量名  
+
+* 着色轮廓段的循环  
+ColorIndex := 0  
+* 设置随机颜色，最多支持360种颜色  
+for i := 0 to 359 by 10  
+    if (i < 120)
+        realR := 255
+        realG := 2.55 * i
+        realB := 0
+    elseif (i < 240)
+        realR := 255 - 2.55 * (i - 120)
+        realG := 255
+        realB := 0
+    else
+        realR := 0
+        realG := 255 - 2.55 * (i - 240)
+        realB := 2.55 * (i - 240)
+    endif
+    * 根据轮廓段的类型选择不同的轮廓  
+    select_shape_xld(ContoursSplit, SelectedContours, 'contour_type', 'lines', -0.5, 0.5)  
+    
+
+    * 根据轮廓段的类型选择不同的轮廓
+    select_shape_xld(ContoursSplit, SelectedContours, 'contour_type', 'lines', -0.5, 0.5)
+    
+    
+    * 使用ContoursColor作为图像参数  
+
+    * 将该颜色的轮廓加入到输出图像中  
+    union1(ContoursColor, ContoursColor)  
+    * UnionContours其实是多余的，这里直接用ContoursColor就可以  
+
+    * 清除临时变量  
+    clear_obj(SelectedContours)  
+
+    * 选择圆弧段  
+    select_shape_xld(ContoursSplit, SelectedContours, 'contour_type', 'circles', -0.5, 0.5)  
+    paint_xld( ContoursColor, R, G, B)  
+    union1(ContoursColor, ContoursColor)  
+    * 这里也可以直接用ContoursColor  
+    
+endfor  
+
+* 显示和保存输出图像  
+dev_display(ContoursColor)  
+write_image(ContoursColor, 'png', 0, 'colored_contours.png')
